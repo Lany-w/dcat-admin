@@ -1,6 +1,6 @@
 <body
-        class="dcat-admin-body sidebar-mini layout-fixed {{ $configData['body_class']}} {{ $configData['sidebar_class'] }}
-        {{ $configData['navbar_class'] === 'fixed-top' ? 'navbar-fixed-top' : '' }} " >
+    class="dcat-admin-body sidebar-mini layout-fixed {{ $configData['body_class']}} {{ $configData['sidebar_class'] }}
+    {{ $configData['navbar_class'] === 'fixed-top' ? 'navbar-fixed-top' : '' }} " >
 
 <script>
     var Dcat = CreateDcat({!! Dcat\Admin\Admin::jsVariables() !!});
@@ -22,11 +22,9 @@
 
 <footer class="main-footer pt-1">
     <p class="clearfix blue-grey lighten-2 mb-0 text-center">
-            <span class="text-center d-block d-md-inline-block mt-25">
-                Powered by
-                <a target="_blank" href="https://github.com/jqhph/dcat-admin">Dcat Admin</a>
-                <span>&nbsp;·&nbsp;</span>
-                v{{ Dcat\Admin\Admin::VERSION }}
+        Powered by
+        <span class="text-center d-block d-md-inline-block mt-25">
+                <a target="_blank" href="http://www.rinsys.com">苏州睿能科技有限公司</a>
             </span>
 
         <button class="btn btn-primary btn-icon scroll-top pull-right" style="position: fixed;bottom: 2%; right: 10px;display: none">

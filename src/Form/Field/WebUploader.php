@@ -243,7 +243,7 @@ trait WebUploader
             ],
         ];
 
-        $this->options($this->options += $defaultOptions);
+        $this->options($defaultOptions);
     }
 
     protected function setDefaultServer()

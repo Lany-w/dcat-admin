@@ -156,24 +156,14 @@ class PermissionController extends AdminController
             }
 
             if (! Str::contains($uri, '{')) {
-                if ($prefix !== '/') {
-                    $route = Str::replaceFirst($prefix, '', $uri . '*');
-                } else {
-                    $route = $uri.'*';
-                }
+                $route = Str::replaceFirst($prefix, '', $uri.'*');
 
                 if ($route !== '*') {
                     $container->push($route);
                 }
             }
 
-            $path = preg_replace('/{.*}+/', '*', $uri);
-
-            if ($prefix !== '/') {
-                return Str::replaceFirst($prefix, '', $path);
-            }
-
-            return $path;
+            return Str::replaceFirst($prefix, '', preg_replace('/{.*}+/', '*', $uri));
         });
 
         return $container->merge($routes)->filter()->all();

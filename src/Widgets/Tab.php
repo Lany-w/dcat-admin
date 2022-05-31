@@ -2,7 +2,6 @@
 
 namespace Dcat\Admin\Widgets;
 
-use Dcat\Admin\Admin;
 use Illuminate\Contracts\Support\Renderable;
 
 class Tab extends Widget
@@ -34,13 +33,12 @@ class Tab extends Widget
      * @param  string  $title
      * @param  string|Renderable  $content
      * @param  bool  $active
-     * @param  string|null  $id
      * @return $this
      */
-    public function add($title, $content, $active = false, $id = null)
+    public function add($title, $content, $active = false)
     {
         $this->data['tabs'][] = [
-            'id'      => $id ?: mt_rand(),
+            'id'      => mt_rand(),
             'title'   => $title,
             'content' => $this->toString($this->formatRenderable($content)),
             'type'    => static::TYPE_CONTENT,
@@ -171,27 +169,6 @@ class Tab extends Widget
             ['attributes' => $this->formatHtmlAttributes()]
         );
 
-        $this->setupScript();
-
         return view($this->view, $data)->render();
-    }
-
-    /**
-     * Setup script.
-     */
-    protected function setupScript()
-    {
-        $script = <<<'SCRIPT'
-var hash = document.location.hash;
-if (hash) {
-    $('.nav-tabs a[href="' + hash + '"]').tab('show');
-}
-
-// Change hash for page-reload
-$('.nav-tabs a').on('shown.bs.tab', function (e) {
-    history.pushState(null,null, e.target.hash);
-});
-SCRIPT;
-        Admin::script($script);
     }
 }

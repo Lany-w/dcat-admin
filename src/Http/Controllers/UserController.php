@@ -2,6 +2,7 @@
 
 namespace Dcat\Admin\Http\Controllers;
 
+use Carbon\Carbon;
 use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Http\Auth\Permission;
@@ -9,6 +10,7 @@ use Dcat\Admin\Http\Repositories\Administrator;
 use Dcat\Admin\Models\Administrator as AdministratorModel;
 use Dcat\Admin\Show;
 use Dcat\Admin\Support\Helper;
+use Dcat\Admin\Traits\HasDateTimeFormatter;
 use Dcat\Admin\Widgets\Tree;
 
 class UserController extends AdminController
@@ -48,15 +50,22 @@ class UserController extends AdminController
                     ->display('');
             }
 
-            $grid->column('created_at');
-            $grid->column('updated_at')->sortable();
+            $grid->column('created_at')->display(function($time) {
+                return $time ? $time : date('Y-m-d H:i:s', $time);
+            });
+            $grid->column('last_login_time', '登录时间')->display(function($time) {
+                return $time ? date('Y-m-d H:i:s', $time) : '';
+                //return $time ? Carbon::parse($time)->toDateTimeString() : '';
+            })->sortable();
 
             $grid->quickSearch(['id', 'name', 'username']);
 
-            $grid->showQuickEditButton();
+            //$grid->showQuickEditButton();
             $grid->enableDialogCreate();
-            $grid->showColumnSelector();
-            $grid->disableEditButton();
+            //$grid->showColumnSelector();
+            //$grid->disableEditButton();
+
+            $grid->disableViewButton();
 
             $grid->actions(function (Grid\Displayers\Actions $actions) {
                 if ($actions->getKey() == AdministratorModel::DEFAULT_ID) {
@@ -134,6 +143,7 @@ class UserController extends AdminController
                 ->creationRules(['required', "unique:{$connection}.{$userTable}"])
                 ->updateRules(['required', "unique:{$connection}.{$userTable},username,$id"]);
             $form->text('name', trans('admin.name'))->required();
+            $form->email('email', trans('admin.email'))->required();
             $form->image('avatar', trans('admin.avatar'))->autoUpload();
 
             if ($id) {
@@ -153,7 +163,7 @@ class UserController extends AdminController
             $form->password('password_confirmation', trans('admin.password_confirmation'))->same('password');
 
             $form->ignore(['password_confirmation']);
-
+            $form->hidden('pwd_change_time');
             if (config('admin.permission.enable')) {
                 $form->multipleSelect('roles', trans('admin.roles'))
                     ->options(function () {
@@ -166,15 +176,13 @@ class UserController extends AdminController
                     });
             }
 
-            $form->display('created_at', trans('admin.created_at'));
-            $form->display('updated_at', trans('admin.updated_at'));
-
             if ($id == AdministratorModel::DEFAULT_ID) {
                 $form->disableDeleteButton();
             }
         })->saving(function (Form $form) {
             if ($form->password && $form->model()->get('password') != $form->password) {
                 $form->password = bcrypt($form->password);
+                $form->pwd_change_time = now()->timestamp;
             }
 
             if (! $form->password) {

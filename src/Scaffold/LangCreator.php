@@ -64,7 +64,7 @@ class LangCreator
      */
     protected function getLangPath(string $controller)
     {
-        $path = rtrim(app()->langPath(), '/').'/'.App::getLocale();
+        $path = resource_path('lang/'.App::getLocale());
 
         return $path.'/'.Helper::slug($controller).'.php';
     }

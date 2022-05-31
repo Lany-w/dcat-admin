@@ -4,9 +4,6 @@
 
     $soft = Dcat\Admin\Widgets\Checkbox::make('soft_deletes')->inline();
     $soft->options([1 => (trans('admin.scaffold.soft_delete'))]);
-    if (old('soft_deletes') != NULL) {
-        $soft->check(1);
-    }
 
     $actionCreators = Dcat\Admin\Widgets\Checkbox::make('create[]')->inline();
     $actionCreators->options([
@@ -16,8 +13,7 @@
         'controller' => (trans('admin.scaffold.create_controller')),
         'migrate' => (trans('admin.scaffold.run_migrate')),
         'lang' => (trans('admin.scaffold.create_lang')),
-    ]);
-    old('create') ? $actionCreators->check(old('create')) : $actionCreators->checkAll(['migration', 'migrate']);
+    ])->checkAll(['migrate', 'migration']);
 @endphp
 <style>
     .select2-container .select2-selection--single {

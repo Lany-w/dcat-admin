@@ -19,48 +19,40 @@ export default class DarkMode {
         var storage = localStorage || {setItem:function () {}, getItem: function () {}},
             darkMode = this,
             key = 'dcat-admin-theme-mode',
+            mode = storage.getItem(key),
             icon = '.dark-mode-switcher i';
 
-        function switchMode(theme) {
-            switch (theme) {
-                case 'dark': {
-                    $(icon).addClass('icon-sun').removeClass('icon-moon');
-                    darkMode.display(true);
-                    break;
-                }
-                case 'def': {
-                    darkMode.display(false);
-                    $(icon).removeClass('icon-sun').addClass('icon-moon');
-                    break;
-                }
-                default: {
-                    break;
-                }
+        function switchMode(dark) {
+            if (dark) {
+                $(icon).addClass('icon-sun').removeClass('icon-moon');
+                darkMode.display(true);
+                return;
             }
+
+            darkMode.display(false);
+            $(icon).removeClass('icon-sun').addClass('icon-moon');
         }
 
-        switchMode(storage.getItem(key));
+        if (mode === 'dark') {
+            switchMode(true);
+        } else if (mode === 'def') {
+            switchMode(false)
+        }
 
         $(document).off('click', selector).on('click', selector, function () {
             $(icon).toggleClass('icon-sun icon-moon');
 
             if ($(icon).hasClass('icon-moon')) {
-                switchMode('def');
+                switchMode(false);
 
                 storage.setItem(key, 'def');
 
             } else {
                 storage.setItem(key, 'dark');
 
-                switchMode('dark')
+                switchMode(true)
             }
         })
-
-        window.addEventListener('storage', function (event) {
-            if (event.key === key) {
-                switchMode(event.newValue);
-            }
-        });
     }
 
     toggle() {

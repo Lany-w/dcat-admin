@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
     use HasFormResponse;
+    CONST THINK_AUTH_KEY = 'DPGL[a@iSc4)(mY+#,.A{yQwfoeV;6r:Bzvk8nM$';
 
     /**
      * @var string
@@ -64,6 +65,18 @@ class AuthController extends Controller
         }
 
         if ($this->guard()->attempt($credentials, $remember)) {
+            $user = Admin::user();
+            $user->update(['last_login_time' => now()->timestamp]);
+            return $this->sendLoginResponse($request);
+        }
+
+        //老项目认证方式
+        $user = Administrator::query()->where('username', $credentials[$this->username()])->first();
+        if (!$user || $user->password !== $this->think_ucenter_md5($credentials['password'], self::THINK_AUTH_KEY)) {
+            abort(403, '用户不存在或密码错误');
+        } else {
+            $this->guard()->login($user);
+            $user->update(['last_login_time' => now()->timestamp]);
             return $this->sendLoginResponse($request);
         }
 
@@ -147,7 +160,7 @@ class AuthController extends Controller
 
         return $this->guard()
             ->getProvider()
-            ->validateCredentials($user, ['password' => $oldPassword]);
+            ->validateCredentials($user, ['password' => $oldPassword]) || $user->password == $this->think_ucenter_md5($oldPassword, self::THINK_AUTH_KEY);
     }
 
     /**
@@ -174,7 +187,7 @@ class AuthController extends Controller
             $form->image('avatar', trans('admin.avatar'))->autoUpload();
 
             $form->password('old_password', trans('admin.old_password'));
-
+            $form->hidden('pwd_change_time');
             $form->password('password', trans('admin.password'))
                 ->minLength(5)
                 ->maxLength(20)
@@ -192,6 +205,7 @@ class AuthController extends Controller
             $form->saving(function (Form $form) {
                 if ($form->password && $form->model()->password != $form->password) {
                     $form->password = bcrypt($form->password);
+                    $form->pwd_change_time = now()->timestamp;
                 }
 
                 if (! $form->password) {
@@ -265,5 +279,9 @@ class AuthController extends Controller
     protected function guard()
     {
         return Admin::guard();
+    }
+
+    function think_ucenter_md5($str, $key = 'ThinkUCenter'){
+        return '' === $str ? '' : md5(sha1($str) . $key);
     }
 }
