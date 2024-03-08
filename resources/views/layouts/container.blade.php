@@ -12,7 +12,6 @@
     @include('admin::partials.sidebar')
 
     @include('admin::partials.navbar')
-
     <div class="app-content content">
         <div class="content-wrapper" id="{{ $pjaxContainerId }}" style="top: 0;min-height: 900px;">
             @yield('app')
