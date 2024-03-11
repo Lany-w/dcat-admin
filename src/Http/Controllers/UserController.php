@@ -53,10 +53,6 @@ class UserController extends AdminController
             $grid->column('created_at')->display(function($time) {
                 return $time ? $time : date('Y-m-d H:i:s', $time);
             });
-            $grid->column('last_login_time', '登录时间')->display(function($time) {
-                return $time ? date('Y-m-d H:i:s', $time) : '';
-                //return $time ? Carbon::parse($time)->toDateTimeString() : '';
-            })->sortable();
 
             $grid->quickSearch(['id', 'name', 'username']);
 
