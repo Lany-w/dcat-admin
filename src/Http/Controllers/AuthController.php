@@ -65,7 +65,6 @@ class AuthController extends Controller
 
         if ($this->guard()->attempt($credentials, $remember)) {
             $user = Admin::user();
-            $user->update(['last_login_time' => now()->timestamp]);
             return $this->sendLoginResponse($request);
         }
 
